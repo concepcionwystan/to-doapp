@@ -1,0 +1,139 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>To-do List</title>
+    <h4>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/1.11.8/semantic.min.css"/>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/1.11.8/semantic.min.js"></script>
+</head>
+
+  <body>
+
+    <img class="ui medium circular image" src="/static/logo.png" style="margin-left:500px;margin-right:auto;margin-top: 100px">
+    <div style = "margin-top:100px;margin-left: 500px;margin-right:700px">
+
+
+    <table>
+      <tr>
+        <td>
+          <button class = "ui button"><a href="{{ url_for('home') }}">Home</a></button>
+        </td>
+        <td>
+        <form method="GET" action="/search">
+          <div class = "ui icon input">
+          <input type="text" placeholder = "Search" name="search">
+          <i class="search icon"></i>
+          </div>
+        </form>
+        </td>
+      </tr>
+    </table>
+
+    <input name="d_elem" type="hidden" value="{{task}}" id="d_elem" />
+    {% if task %}
+    <div id="app">
+      <table class = "ui very basic table" style = "margin-top: 50px">
+        <template v-for="todo in tasks">
+          <tr>
+            <td>
+
+              <div :class="{activeClass:todo.isActive}">
+
+              <form method="POST" action="./update" style="display: inline">
+                <input type="hidden" v-bind:value="[[todo.title]]" name="oldtitle">
+
+                  <div v-on:mouseleave="toggleFalse(todo);showHidden=true" v-on:mouseover="toggleTrue(todo);showHidden=false" v-bind:class="{'ui transparent input' : (!getTextBox(todo,showDelete)&!showhidden),'ui fluid input':(todo.isActive&!showhidden)}">
+                    <input  style="width: 550px;font-size:1.25rem" v-bind:value = "[[todo.title]]" type="text" name="newtitle">
+                </div>
+              </form>
+
+            </td>
+
+            <td>
+            <form method="POST" action="./delete" style="display: inline">
+              <input type="hidden" v-bind:value="[[todo.title]]" name="title">
+              <button v-on:mouseleave="showDelete='Transparent';toggleFalse(todo)" v-on:mouseover="showDelete = '#90EE90';toggleTrue(todo)" v-bind:style="{'background-color' : getColor(todo,showHidden)}" class = "ui vertical animated button" type="submit"  value="Delete">
+                <div class="hidden content"><i class="icon check"></i></div>
+                <div class="visible content"><i class="circle outline icon"></i></div>
+                
+              </button>
+              </form>
+              </div>
+            </td>
+
+
+          </tr>
+        </template>
+      </table>
+    </div>
+    {%else%}
+     <table class = "ui very basic table" style = "margin-top: 50px">
+      <tr>
+        <td>Nothing found</td>
+      </tr>
+      </table>
+    {%endif%}
+
+
+
+
+
+
+
+
+   <script src="https://cdn.jsdelivr.net/npm/vue@2.5.13/dist/vue.js"></script>
+    <script>
+        var d_var = $("#d_elem").val();
+        var vard = JSON.parse(d_var)
+        var app = new Vue({
+            el: '#app',
+            delimiters: ['[[', ']]'],
+            data: {
+                message: 'SD DS!',
+                showHidden: true,
+                showDelete: 'Transparent',
+                tasks: vard
+              },
+            methods: {
+              toggleTrue: function (item) {
+                item.isActive = true;
+              },
+              toggleFalse: function (item) {
+                item.isActive = false;
+              },
+              getColor: function(item,vari){
+                if (item.isActive & vari){
+                  return '#90EE90'
+                }
+                else{
+                  return 'Transparent'
+                }
+              },
+              getTextBox: function(item,vari){
+                if(item.isActive & vari=='Transparent'){
+                  return true
+                }
+                else{
+                  return false
+                }
+              }
+            },
+            
+        })
+        
+        $(".close.icon").click(function(){
+          $(this).parent().transition('fade');
+        });
+
+        $('.ui.search')
+          .search({
+            source: vard  
+          })
+        ;
+    </script>
+
+  </body>
+</html>

@@ -1,0 +1,120 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>To-do List</title>
+    <h4>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/1.11.8/semantic.min.css"/>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script> 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/1.11.8/semantic.min.js"></script>
+</head>
+
+  <body>
+    <!-- <img class="ui medium circular image" src="/static/logo.jpg" style="margin-left:auto;margin-right:auto"> -->
+    <div style = "margin-top:200px;margin-left: 500px;margin-right:700px">
+     {% if error %}
+     <div class="ui negative message">
+      <i class="close icon"></i>
+      <div class="header">
+        {{error}}
+      </div>
+    </div>
+    {% endif %}
+
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+       <div class="ui negative message">
+          <i class="close icon"></i>
+          <div class="header">
+           Task already present
+          </div>
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <table>
+      <tr>
+        <td>
+        <form method="POST" action="/">
+          <div class = "ui input">
+          <input type="text" placeholder = "Task" name="title">
+          </div>
+          <input type="submit" class="ui button" value="Add">
+        </form>
+        </td>
+        <td>
+        <form method="GET" action="/search">
+          <div class = "ui icon input">
+          <input type="text" placeholder = "Search" name="search">
+          <i class="search icon"></i>
+          </div>
+        </form>
+        </td>
+      </tr>
+    </table>
+
+    <input name="d_elem" type="hidden" value="{{tasks}}" id="d_elem" />
+    <div id="app">
+      <table class = "attached ui selectable table" style = "margin-top: 50px">
+        <template v-for="todo in tasks">
+          <tr>
+            <td>
+              <form method="POST" action="./update" style="display: inline">
+                <input type="hidden" v-bind:value="[[todo.title]]" name="oldtitle">
+                  <div v-on:mouseleave="showHidden=true" v-on:mouseover="showHidden = false " v-bind:class="{'ui transparent input' : showHidden,'ui input' : !showHidden}">
+                    <input  style="width: 550px;" v-bind:value = "[[todo.title]]" type="text" name="newtitle">
+                </div>
+              </form>
+            </td>
+            <td>
+            <form method="POST" action="./delete" style="display: inline">
+              <input type="hidden" v-bind:value="[[todo.title]]" name="title">
+              <button v-on:mouseleave="showDelete='white'" v-on:mouseover="showDelete = '#90EE90'" v-bind:style="{'background-color' : showDelete}" class = "circular ui icon button" type="submit"  value="Delete"><i class="icon check"></i></button>
+            </form>
+          </td>
+          </tr>
+        </template>
+      </table>
+    </div>
+
+
+   <script src="https://cdn.jsdelivr.net/npm/vue@2.5.13/dist/vue.js"></script>
+    <script>
+        Vue.component('toggle-task-item', {
+          template: '#task-item',
+          props: ['task'],
+          methods: {
+            toggle() {
+              this.isActive = !this.isActive;
+            }
+          },
+          data() {
+            return {
+              isActive: false
+            }
+          },
+        })
+
+
+
+        var d_var = $("#d_elem").val();
+        var vard = JSON.parse(d_var)
+        var app = new Vue({
+            el: '#app',
+            delimiters: ['[[', ']]'],
+            data: {
+                message: 'SD DS!',
+                showHidden: true,
+                showDelete: "white",
+                tasks: vard
+              }
+        })
+        
+        $(".close.icon").click(function(){
+          $(this).parent().hide();
+        });
+    </script>
+
+  </body>
+</html>
